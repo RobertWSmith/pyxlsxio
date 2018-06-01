@@ -28,7 +28,7 @@ def make_extension(name, path):
         extra_compile_args=['-O2', '-Wall'],
         extra_link_args=['-g', ],
         include_dirs=[PYXLSXIO_INCLUDE_DIR, "."],
-        libraries=["xlsxio_read", "xlsxio_write", "expat", "minzip"],
+        libraries=["xlsxio_read", "xlsxio_write", "expat", "zip"],
         library_dirs=[PYXLSXIO_LIB_DIR, '.'],
     )
 
