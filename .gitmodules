@@ -1,0 +1,6 @@
+[submodule "external/xlsxio"]
+	path = external/xlsxio
+	url = https://github.com/brechtsanders/xlsxio.git
+	branch = origin/master
+  update = checkout
+  ignore = dirty
