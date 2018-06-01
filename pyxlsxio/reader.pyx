@@ -8,7 +8,7 @@ from libc.stdint cimport int64_t
 from libc.time cimport time_t
 
 cimport xlsxio_read
-from pyxlsxio.pyxlsxio cimport _cptr
+from pyxlsxio cimport _cptr
 
 from cpython.version cimport PY_MAJOR_VERSION
 
