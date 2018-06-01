@@ -1,0 +1,96 @@
+* text=auto
+*.sh text eol=lf
+
+# Documents
+# ======================== #
+.gitignore    text
+*.md          text
+*.txt         text
+*.csv         text
+*.tsv         text
+*.tab         text
+*.php         text
+*.css         text
+*.js          text
+*.htm         text
+*.html        text
+*.xml         text
+*.ini         text
+*.inc         text
+.htaccess     text
+
+# Source files
+# ======================== #
+*.sql         text
+*.pxd         text
+*.py          text
+*.py3         text
+*.pyw         text
+*.pyx         text
+*.c           text
+*.cc          text
+*.cxx         text
+*.cpp         text
+*.c++         text
+*.h           text
+*.hh          text
+*.hpp         text
+*.h++         text
+
+# Binary files
+# ======================== #
+*.db          binary
+*.p           binary
+*.pkl         binary
+*.pyc         binary
+*.pyd         binary
+*.pyo         binary
+*.tar         binary
+*.gz          binary
+*.bz2         binary
+*.xz          binary
+*.zip         binary
+*.7z          binary
+
+# Compiled Object files
+# ======================== #
+*.slo         binary
+*.lo          binary
+*.o           binary
+*.obj         binary
+
+# Precompiled Headers
+# ======================== #
+*.gch         binary
+*.pch         binary
+
+# Compiled Dynamic libraries
+# ======================== #
+*.so          binary
+*.dylib       binary
+*.dll         binary
+
+# Compiled Static libraries
+# ======================== #
+*.lai         binary
+*.la          binary
+*.a           binary
+*.lib         binary
+
+# Executables
+# ======================== #
+*.exe         binary
+*.out         binary
+*.app         binary
+
+# Graphics
+# ======================== #
+*.png         binary
+*.jpg         binary
+*.jpeg        binary
+*.gif         binary
+*.ico         binary
+*.tif         binary
+*.tiff        binary
+*.svg         text
+*.eps         binary
