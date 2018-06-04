@@ -41,7 +41,7 @@ class Writer(object):
 
   @row_height.setter
   def row_height(self, value):
-    assert (value is not None) and isinstance(value, double) and (value >= 0.0):
+    assert (value is not None) and isinstance(value, double) and (value >= 0.0)
     self._row_height = int(value)
     self.handle.set_row_height(self._row_height)
 
