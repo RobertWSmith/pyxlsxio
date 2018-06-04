@@ -42,10 +42,8 @@ retcode_check
 cmake --build . --clean-first --config Release
 
 cp $XLSXIO_SOURCE_DIR/include/*.h $XLSXIO_INSTALL_INCLUDE_DIR
-retcode_check
 
 # BUILD_STATIC=ON indicates the library will have the 'a' extensions
 cp $XLSXIO_BUILD_DIR/libxlsxio_*.a $XLSXIO_INSTALL_LIB_DIR
-retcode_check
 
 cd $START_DIR
