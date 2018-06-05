@@ -61,12 +61,12 @@ cdef class CReader:
         if self.handle != NULL:
             xlsxio_read.xlsxioread_close(self.handle)
 
-    cdef bint open(self, const char* filepath):
+    cpdef bint open(self, const char* filepath):
         self.c_close()
         self.handle = xlsxio_read.xlsxioread_open(filepath)
         return self.handle != NULL
 
-    cdef void close(self):
+    cpdef void close(self):
         if self.handle != NULL:
             xlsxio_read.xlsxioread_close(self.handle)
         self.handle = NULL
