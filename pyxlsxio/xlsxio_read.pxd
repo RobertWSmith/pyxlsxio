@@ -77,19 +77,19 @@ cdef extern from "xlsxio_read.h":
     #    */
     # /*! \brief don't skip any rows or cells \hideinitializer */
     #define XLSXIOREAD_SKIP_NONE                        0
-    enum XLSXIOREAD_SKIP_NONE
+    unsigned int     XLSXIOREAD_SKIP_NONE
     # /*! \brief skip empty rows (note: cells may appear empty while they actually contain data) \hideinitializer */
     #define XLSXIOREAD_SKIP_EMPTY_ROWS            0x01
-    enum XLSXIOREAD_SKIP_EMPTY_ROWS
+    unsigned int     XLSXIOREAD_SKIP_EMPTY_ROWS
     # /*! \brief skip empty cells \hideinitializer */
     #define XLSXIOREAD_SKIP_EMPTY_CELLS         0x02
-    enum XLSXIOREAD_SKIP_EMPTY_CELLS
+    unsigned int     XLSXIOREAD_SKIP_EMPTY_CELLS
     # /*! \brief skip empty rows and cells \hideinitializer */
     #define XLSXIOREAD_SKIP_ALL_EMPTY             (XLSXIOREAD_SKIP_EMPTY_ROWS | XLSXIOREAD_SKIP_EMPTY_CELLS)
-    enum XLSXIOREAD_SKIP_ALL_EMPTY
+    unsigned int     XLSXIOREAD_SKIP_ALL_EMPTY
     # /*! \brief skip extra cells to the right of the rightmost header cell \hideinitializer */
     #define XLSXIOREAD_SKIP_EXTRA_CELLS         0x04
-    enum XLSXIOREAD_SKIP_EXTRA_CELLS
+    unsigned int     XLSXIOREAD_SKIP_EXTRA_CELLS
     # /*! @} */
 
 
