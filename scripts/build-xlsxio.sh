@@ -35,7 +35,6 @@ cmake -G "$CMAKE_BUILD_GENERATOR" -Wno-dev -Wno-deprecated \
     -DWITH_LIBZIP:BOOL=ON \
     -DWITH_WIDE:BOOL=OFF \
     $XLSXIO_SOURCE_DIR
-retcode_check
 
 cmake --build . --clean-first --config Release
 
