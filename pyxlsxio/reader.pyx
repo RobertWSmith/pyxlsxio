@@ -119,12 +119,9 @@ cdef class WorksheetReader:
     cdef xlsxio_read.xlsxioreadersheet handle
     cdef list typelist
 
-    def __cinit__(self, CReader reader, str sheet_name not None,
-                  unsigned flags):
+    def __cinit__(self, CReader reader not None, str sheet_name not None,
+                  unsigned int flags):
         cdef const char* sn
-
-        if reader == NULL:
-            raise IOError("Reader cannot be NULL")
 
         if flags is None:
             flags = <unsigned>(XLSXIOREAD_SKIP_EXTRA_CELLS |
