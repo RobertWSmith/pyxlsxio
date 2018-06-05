@@ -51,14 +51,13 @@ class Reader(object):
         del self.filepath
 
     def get_sheetlist(self):
-        return self._reader.get_sheetlist()
+        return WorksheetList(self._reader)
 
     def get_worksheet(self, sheetname, flags=None):
-        if flags is None:
-            flags = XLSXIOREAD_SKIP_EXTRA_CELLS | XLSXIOREAD_SKIP_EMPTY_ROWS
-        output = self._reader.get_worksheet(sheetname, flags)
-        return output
-
+      if flags is None:
+          flags = XLSXIOREAD_SKIP_EXTRA_CELLS | XLSXIOREAD_SKIP_EMPTY_ROWS
+      r = WorksheetReader(self._reader, sheetname, flags)
+      return r
 
 cdef class CReader:
     cdef xlsxio_read.xlsxioreader handle
@@ -80,18 +79,12 @@ cdef class CReader:
             xlsxio_read.xlsxioread_close(self.handle)
         self.handle = NULL
 
-    def get_sheetlist(self):
-        return WorksheetList(self.handle)
-
-    def get_worksheet(self, sheetname, flags):
-        return self._reader.get_worksheet(sheetname, flags)
-
 
 cdef class WorksheetList:
     cdef xlsxio_read.xlsxioreadersheetlist handle
 
-    def __cinit__(self, xlsxio_read.xlsxioreader reader):
-        self.handle = xlsxio_read.xlsxioread_sheetlist_open(reader)
+    def __cinit__(self, CReader reader):
+        self.handle = xlsxio_read.xlsxioread_sheetlist_open(reader.handle)
 
     def __dealloc__(self):
         if self.handle != NULL:
@@ -126,7 +119,7 @@ cdef class WorksheetReader:
     cdef xlsxio_read.xlsxioreadersheet handle
     cdef list typelist
 
-    def __cinit__(self, xlsxio_read.xlsxioreader reader, str sheet_name not None,
+    def __cinit__(self, CReader reader, str sheet_name not None,
                   unsigned flags):
         cdef const char* sn
 
@@ -137,7 +130,7 @@ cdef class WorksheetReader:
             flags = <unsigned>(XLSXIOREAD_SKIP_EXTRA_CELLS |
                                XLSXIOREAD_SKIP_EMPTY_ROWS)
         sn = _cptr(sheet_name)
-        self.handle = xlsxio_read.xlsxioread_sheet_open(reader, sn, flags)
+        self.handle = xlsxio_read.xlsxioread_sheet_open(reader.handle, sn, flags)
         self.typelist = list()
         stdlib.free(<void*>(sn))
 
