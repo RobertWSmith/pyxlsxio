@@ -32,5 +32,5 @@ setup(
     name="pyxlsxio",
     version="2.0.0",
     packages=["pyxlsxio", ],
-    ext_modules=cythonzie(extensions)
+    ext_modules=cythonize(extensions)
 )
