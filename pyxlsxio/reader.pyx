@@ -27,40 +27,37 @@ cdef str get_version():
 
 class Reader(object):
 
-  def __init__(self, filepath):
-    self.filepath = filepath
-    self._reader = CReader()
+    def __init__(self, filepath):
+        cdef const char* fp
+        self._reader = CReader()
 
-  def __del__(self):
-    del self._reader
-    del self.filepath
+        if filepath is not None:
+            self.filepath = filepath
 
-  def open(self, filepath=None):
-    cdef const char* fp
-    if filepath is not None:
-      self.filepath = filepath
+        if not os.path.isfile(self.filepath):
+            raise IOError("File not found `{0}`".format(self.filepath))
 
-    if not os.path.isfile(self.filepath):
-      raise IOError("File not found `{0}`".format(self.filepath))
+        fp = _cptr(self.filepath)
+        output = self._reader.open(fp)
+        stdlib.free(<void*>(fp))
 
-    fp = _cptr(self.filepath)
-    output = self._reader.open(fp)
-    stdlib.free(<void*>(fp))
+        if output:
+            self._reader.close()
+            raise IOError("Workbook could not be opened @ `{0}`".format(self.filepath))
 
-    if output:
-      raise IOError("Workbook could not be opened @ `{0}`".format(self.filepath))
+    def __del__(self):
+        self._reader.close()
+        del self._reader
+        del self.filepath
 
-  def close(self):
-    self._reader.close()
+    def get_sheetlist(self):
+        return self._reader.get_sheetlist()
 
-  def get_sheetlist(self):
-    return self._reader.get_sheetlist()
-
-  def get_worksheet(self, sheetname, flags=None):
-    if flags is None:
-      flags = XLSXIOREAD_SKIP_EXTRA_CELLS | XLSXIOREAD_SKIP_EMPTY_ROWS
-    output = self._reader.get_worksheet(sheetname, flags)
-    return output
+    def get_worksheet(self, sheetname, flags=None):
+        if flags is None:
+            flags = XLSXIOREAD_SKIP_EXTRA_CELLS | XLSXIOREAD_SKIP_EMPTY_ROWS
+        output = self._reader.get_worksheet(sheetname, flags)
+        return output
 
 
 cdef class CReader:
@@ -71,7 +68,7 @@ cdef class CReader:
 
     def __dealloc__(self):
         if self.handle != NULL:
-          xlsxio_read.xlsxioread_close(self.handle)
+            xlsxio_read.xlsxioread_close(self.handle)
 
     cdef bint open(self, const char* filepath):
         self.c_close()
@@ -79,31 +76,26 @@ cdef class CReader:
         return self.handle != NULL
 
     cdef void close(self):
-      if self.handle != NULL:
-        xlsxio_read.xlsxioread_close(self.handle)
-      self.handle = NULL
+        if self.handle != NULL:
+            xlsxio_read.xlsxioread_close(self.handle)
+        self.handle = NULL
 
-    cdef WorksheetList get_sheetlist(self):
-      cdef WorksheetList output
-      output = WorksheetList(self.handle)
-      return output
+    def get_sheetlist(self):
+        return WorksheetList(self.handle)
 
-    cdef WorksheetReader get_worksheet(self, sheetname, flags):
-      cdef WorksheetReader output
-      output = self._reader.get_worksheet(sheetname, flags)
-      return output
+    def get_worksheet(self, sheetname, flags):
+        return self._reader.get_worksheet(sheetname, flags)
 
 
 cdef class WorksheetList:
     cdef xlsxio_read.xlsxioreadersheetlist handle
 
     def __cinit__(self, xlsxio_read.xlsxioreader reader):
-        assert reader is not None
         self.handle = xlsxio_read.xlsxioread_sheetlist_open(reader)
 
     def __dealloc__(self):
-      if self.handle != NULL:
-          xlsxio_read.xlsxioread_sheetlist_close(self.handle)
+        if self.handle != NULL:
+            xlsxio_read.xlsxioread_sheetlist_close(self.handle)
 
     def __iter__(self):
         return self
@@ -112,7 +104,7 @@ cdef class WorksheetList:
         cdef const char* data
 
         if self.handle == NULL:
-          raise StopIteration()
+            raise StopIteration()
 
         data = self.get_next()
         if data == NULL:
@@ -139,7 +131,7 @@ cdef class WorksheetReader:
         cdef const char* sn
 
         if reader == NULL:
-          raise IOError("Reader cannot be NULL")
+            raise IOError("Reader cannot be NULL")
 
         if flags is None:
             flags = <unsigned>(XLSXIOREAD_SKIP_EXTRA_CELLS |
@@ -179,8 +171,8 @@ cdef class WorksheetReaderRowIterator:
             raise StopIteration()
 
     cdef bint has_next_row(self):
-      # source docs: non-zero if a new row is available
-      return xlsxio_read.xlsxioread_sheet_next_row(self.sheet.handle) != 0
+        # source docs: non-zero if a new row is available
+        return xlsxio_read.xlsxioread_sheet_next_row(self.sheet.handle) != 0
 
 
 cdef class WorksheetReaderCellIterator:
@@ -198,52 +190,49 @@ cdef class WorksheetReaderCellIterator:
 
         next_value = self.get_next()
         if next_value == NULL:
-          raise StopIteration()
+            raise StopIteration()
 
         output = <str>(next_value)
         stdlib.free(<void*>(next_value))
         return output
 
     cdef char* get_next(self):
-      # source docs: non-zero if a new row is available
-      return xlsxio_read.xlsxioread_sheet_next_cell(self.sheet.handle)
+        # source docs: non-zero if a new row is available
+        return xlsxio_read.xlsxioread_sheet_next_cell(self.sheet.handle)
 
     cdef bint get_next_string(self, char** value):
-      cdef int results
-      results = xlsxio_read.xlsxioread_sheet_next_cell_string(
-          self.sheet.handle, value)
+        cdef int results
+        results = xlsxio_read.xlsxioread_sheet_next_cell_string(
+            self.sheet.handle, value)
 
-      if (results == 0):
-        value[0] = NULL
-        return False
-      return True
+        if (results == 0):
+            value[0] = NULL
+            return False
+        return True
 
     cdef bint get_next_int(self, int64_t* value):
-      cdef int results
-      results = xlsxio_read.xlsxioread_sheet_next_cell_int(
-          self.sheet.handle, value)
+        cdef int results
+        results = xlsxio_read.xlsxioread_sheet_next_cell_int(self.sheet.handle, value)
 
-      if (results == 0):
-        value[0] = 0
-        return False
-      return True
+        if (results == 0):
+            value[0] = 0
+            return False
+        return True
 
     cdef bint get_next_float(self, double* value):
-      cdef int results
-      results = xlsxio_read.xlsxioread_sheet_next_cell_float(
-          self.sheet.handle, value)
+        cdef int results
+        results = xlsxio_read.xlsxioread_sheet_next_cell_float(self.sheet.handle, value)
 
-      if (results == 0):
-        value[0] = 0
-        return False
-      return True
+        if (results == 0):
+            value[0] = 0
+            return False
+        return True
 
     cdef bint get_next_datetime(self, time_t* value):
-      cdef int results
-      results = xlsxio_read.xlsxioread_sheet_next_cell_datetime(
-          self.sheet.handle, value)
+        cdef int results
+        results = xlsxio_read.xlsxioread_sheet_next_cell_datetime(self.sheet.handle, value)
 
-      if (results == 0):
-        value[0] = 0
-        return False
-      return True
+        if (results == 0):
+            value[0] = 0
+            return False
+        return True
