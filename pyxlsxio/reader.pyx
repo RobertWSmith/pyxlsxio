@@ -34,7 +34,7 @@ class Reader(object):
         if not os.path.isfile(self.filepath):
             raise IOError("File not found `{0}`".format(self.filepath))
 
-        if self._reader.open(filepath):
+        if not self._reader.open(filepath):
             raise IOError("Workbook could not be opened @ `{0}`".format(self.filepath))
 
     def __del__(self):
