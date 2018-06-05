@@ -10,12 +10,12 @@ cdef const char* _cptr(py_input):
 
     i = 0
 
-    print("before calling len on raw input")
+    # print("before calling len on raw input")
     size = len(py_input)
 
-    print("before calling calloc")
+    # print("before calling calloc")
     output = <char*>(stdlib.calloc(size+1, sizeof(char)))
-    print("after calling calloc")
+    # print("after calling calloc")
 
     string.strncpy(output, <const char*>py_input, size)
 

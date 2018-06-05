@@ -54,13 +54,13 @@ class Reader(object):
     self._reader.close()
 
   def get_sheetlist(self):
-    return WorksheetList(self._reader)
+    return self._reader.get_sheetlist()
 
   def get_worksheet(self, sheetname, flags=None):
     if flags is None:
       flags = XLSXIOREAD_SKIP_EXTRA_CELLS | XLSXIOREAD_SKIP_EMPTY_ROWS
-    r = WorksheetReader(self._reader, sheetname, flags)
-    return r
+    output = self._reader.get_worksheet(sheetname, flags)
+    return output
 
 
 cdef class CReader:
@@ -83,13 +83,23 @@ cdef class CReader:
         xlsxio_read.xlsxioread_close(self.handle)
       self.handle = NULL
 
+    cdef WorksheetList get_sheetlist(self):
+      cdef WorksheetList output
+      output = WorksheetList(self.handle)
+      return output
+
+    cdef WorksheetReader get_worksheet(self, sheetname, flags):
+      cdef WorksheetReader output
+      output = self._reader.get_worksheet(sheetname, flags)
+      return output
+
 
 cdef class WorksheetList:
     cdef xlsxio_read.xlsxioreadersheetlist handle
 
-    def __cinit__(self, CReader reader):
+    def __cinit__(self, xlsxio_read.xlsxioreader reader):
         assert reader is not None
-        self.handle = xlsxio_read.xlsxioread_sheetlist_open(reader.handle)
+        self.handle = xlsxio_read.xlsxioread_sheetlist_open(reader)
 
     def __dealloc__(self):
       if self.handle != NULL:
@@ -124,15 +134,18 @@ cdef class WorksheetReader:
     cdef xlsxio_read.xlsxioreadersheet handle
     cdef list typelist
 
-    def __cinit__(self, CReader reader not None, str sheet_name not None,
+    def __cinit__(self, xlsxio_read.xlsxioreader reader, str sheet_name not None,
                   unsigned flags):
         cdef const char* sn
+
+        if reader == NULL:
+          raise IOError("Reader cannot be NULL")
 
         if flags is None:
             flags = <unsigned>(XLSXIOREAD_SKIP_EXTRA_CELLS |
                                XLSXIOREAD_SKIP_EMPTY_ROWS)
         sn = _cptr(sheet_name)
-        self.handle = xlsxio_read.xlsxioread_sheet_open(reader.handle, sn, flags)
+        self.handle = xlsxio_read.xlsxioread_sheet_open(reader, sn, flags)
         self.typelist = list()
         stdlib.free(<void*>(sn))
 
