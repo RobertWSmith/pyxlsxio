@@ -62,7 +62,7 @@ cdef class CReader:
             xlsxio_read.xlsxioread_close(self.handle)
 
     cpdef bint open(self, const char* filepath):
-        self.c_close()
+        self.close()
         self.handle = xlsxio_read.xlsxioread_open(filepath)
         return self.handle != NULL
 
