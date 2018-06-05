@@ -28,21 +28,13 @@ cdef str get_version():
 class Reader(object):
 
     def __init__(self, filepath):
-        cdef const char* fp
         self._reader = CReader()
-
-        if filepath is not None:
-            self.filepath = filepath
+        self.filepath = filepath
 
         if not os.path.isfile(self.filepath):
             raise IOError("File not found `{0}`".format(self.filepath))
 
-        fp = _cptr(self.filepath)
-        output = self._reader.open(fp)
-        stdlib.free(<void*>(fp))
-
-        if output:
-            self._reader.close()
+        if self._reader.open(filepath):
             raise IOError("Workbook could not be opened @ `{0}`".format(self.filepath))
 
     def __del__(self):
